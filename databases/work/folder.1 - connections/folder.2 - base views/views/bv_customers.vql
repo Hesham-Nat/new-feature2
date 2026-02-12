@@ -1,0 +1,43 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+CREATE OR REPLACE WRAPPER JDBC bv_customers
+    FOLDER = '/1 - connections/2 - base views'
+    DATASOURCENAME=ds_sqlserver
+    CATALOGNAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_customers.CATALOGNAME}' 
+    SCHEMANAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_customers.SCHEMANAME}' 
+    RELATIONNAME='Customers' 
+    OUTPUTSCHEMA (
+        customerid = 'CustomerID' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int identity')  NOT NULL SORTABLE IS_AUTOINCREMENT,
+        firstname = 'FirstName' :'java.lang.String' (OPT) (sourcetypesize='50', sourcetypeid='-9', sourcetypename='nvarchar')  NOT NULL SORTABLE,
+        lastname = 'LastName' :'java.lang.String' (OPT) (sourcetypesize='50', sourcetypeid='-9', sourcetypename='nvarchar')  NOT NULL SORTABLE,
+        email = 'Email' :'java.lang.String' (OPT) (sourcetypesize='100', sourcetypeid='-9', sourcetypename='nvarchar')  SORTABLE,
+        createdat = 'CreatedAt' :'java.time.LocalDateTime' (OPT) (sourcetypedecimals='3', sourcetypesize='23', sourcetypeid='93', sourcetypename='datetime')  SORTABLE
+    )
+    CONSTRAINT 'PK__Customer__A4AE64B8A1A5F2CA' PRIMARY KEY ( 'CustomerID' )
+    INDEX 'PK__Customer__A4AE64B8A1A5F2CA' CLUSTER UNIQUE PRIMARY ( 'CustomerID' )
+    INDEX 'UQ__Customer__A9D105344D718F1A' OTHER UNIQUE ( 'Email' );
+
+CREATE OR REPLACE TABLE bv_customers I18N us_pst (
+        customerid:int (notnull, autoincrement, sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        firstname:text (notnull, sourcetypeid = '-9', sourcetypesize = '50'),
+        lastname:text (notnull, sourcetypeid = '-9', sourcetypesize = '50'),
+        email:text (sourcetypeid = '-9', sourcetypesize = '100'),
+        createdat:timestamp (sourcetypeid = '93', sourcetypedecimals = '3', sourcetypesize = '23')
+    )
+    FOLDER = '/1 - connections/2 - base views'
+    CONSTRAINT 'PK__Customer__A4AE64B8A1A5F2CA' PRIMARY KEY ( 'customerid' )
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD bv_customers(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD customerid (any) OPT ANY
+             ADD firstname (any) OPT ANY
+             ADD lastname (any) OPT ANY
+             ADD email (any) OPT ANY
+             ADD createdat (any) OPT ANY
+        )
+        OUTPUTLIST (createdat, customerid, email, firstname, lastname
+        )
+        WRAPPER (jdbc bv_customers)
+    );
+

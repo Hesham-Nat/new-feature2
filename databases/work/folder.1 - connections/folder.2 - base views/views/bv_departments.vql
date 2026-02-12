@@ -1,0 +1,32 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+CREATE OR REPLACE WRAPPER JDBC bv_departments
+    FOLDER = '/1 - connections/2 - base views'
+    DATASOURCENAME=ds_mysql
+    CATALOGNAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_departments.CATALOGNAME}' 
+    RELATIONNAME='departments' 
+    OUTPUTSCHEMA (
+        dept_id = 'dept_id' :'java.lang.Integer' (OPT) (sourcetyperadix='10', sourcetypesize='10', description='', sourcetypeid='4', sourcetypename='INT')  NOT NULL SORTABLE,
+        dept_name = 'dept_name' :'java.lang.String' (OPT) (sourcetyperadix='10', sourcetypesize='100', description='', sourcetypeid='12', sourcetypename='VARCHAR')  SORTABLE
+    )
+    CONSTRAINT 'PRIMARY' PRIMARY KEY ( 'dept_id' )
+    INDEX 'PRIMARY' CLUSTER UNIQUE PRIMARY ( 'dept_id' );
+
+CREATE OR REPLACE TABLE bv_departments I18N us_pst (
+        dept_id:int (notnull, sourcetypeid = '4', sourcetyperadix = '10', sourcetypesize = '10', description = ''),
+        dept_name:text (sourcetypeid = '12', sourcetyperadix = '10', sourcetypesize = '100', description = '')
+    )
+    FOLDER = '/1 - connections/2 - base views'
+    CONSTRAINT 'PRIMARY' PRIMARY KEY ( 'dept_id' )
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD bv_departments(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD dept_id (any) OPT ANY
+             ADD dept_name (any) OPT ANY
+        )
+        OUTPUTLIST (dept_id, dept_name
+        )
+        WRAPPER (jdbc bv_departments)
+    );
+

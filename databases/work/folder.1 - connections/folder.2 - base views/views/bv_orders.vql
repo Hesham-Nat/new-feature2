@@ -1,0 +1,44 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+CREATE OR REPLACE WRAPPER JDBC bv_orders
+    FOLDER = '/1 - connections/2 - base views'
+    DATASOURCENAME=ds_sqlserver
+    CATALOGNAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_orders.CATALOGNAME}' 
+    SCHEMANAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_orders.SCHEMANAME}' 
+    RELATIONNAME='Orders' 
+    OUTPUTSCHEMA (
+        orderid = 'OrderID' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int identity')  NOT NULL SORTABLE IS_AUTOINCREMENT,
+        customerid = 'CustomerID' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int')  NOT NULL SORTABLE,
+        orderdate = 'OrderDate' :'java.time.LocalDateTime' (OPT) (sourcetypedecimals='3', sourcetypesize='23', sourcetypeid='93', sourcetypename='datetime')  SORTABLE,
+        amount = 'Amount' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='2', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='3', sourcetypename='decimal')  NOT NULL SORTABLE,
+        status = 'Status' :'java.lang.String' (OPT) (sourcetypesize='20', sourcetypeid='-9', sourcetypename='nvarchar')  SORTABLE
+    )
+    CONSTRAINT 'PK__Orders__C3905BAF2C453F5B' PRIMARY KEY ( 'OrderID' )
+    CONSTRAINT 'FK__Orders__Customer__2F10007B' FOREIGN KEY ( 'CustomerID' ) 
+    REFERENCES 'denodo'.'dbo'.'Customers'( 'CustomerID' )  ON UPDATE NO ACTION  ON DELETE NO ACTION NOT DEFERRABLE 
+    INDEX 'PK__Orders__C3905BAF2C453F5B' CLUSTER UNIQUE PRIMARY ( 'OrderID' );
+
+CREATE OR REPLACE TABLE bv_orders I18N us_pst (
+        orderid:int (notnull, autoincrement, sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        customerid:int (notnull, sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        orderdate:timestamp (sourcetypeid = '93', sourcetypedecimals = '3', sourcetypesize = '23'),
+        amount:decimal (notnull, sourcetypeid = '3', sourcetyperadix = '10', sourcetypedecimals = '2', sourcetypesize = '10'),
+        status:text (sourcetypeid = '-9', sourcetypesize = '20')
+    )
+    FOLDER = '/1 - connections/2 - base views'
+    CONSTRAINT 'PK__Orders__C3905BAF2C453F5B' PRIMARY KEY ( 'orderid' )
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD bv_orders(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD orderid (any) OPT ANY
+             ADD customerid (any) OPT ANY
+             ADD orderdate (any) OPT ANY
+             ADD amount (any) OPT ANY
+             ADD status (any) OPT ANY
+        )
+        OUTPUTLIST (amount, customerid, orderdate, orderid, status
+        )
+        WRAPPER (jdbc bv_orders)
+    );
+

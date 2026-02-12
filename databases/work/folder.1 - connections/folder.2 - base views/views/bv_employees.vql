@@ -1,0 +1,44 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+CREATE OR REPLACE WRAPPER JDBC bv_employees
+    FOLDER = '/1 - connections/2 - base views'
+    DATASOURCENAME=ds_mysql
+    CATALOGNAME='${databases.work.folder.1 - connections.folder.2 - base views.views.jdbc.bv_employees.CATALOGNAME}' 
+    RELATIONNAME='employees' 
+    OUTPUTSCHEMA (
+        emp_id = 'emp_id' :'java.lang.Integer' (OPT) (sourcetyperadix='10', sourcetypesize='10', description='', sourcetypeid='4', sourcetypename='INT')  NOT NULL SORTABLE,
+        emp_name = 'emp_name' :'java.lang.String' (OPT) (sourcetyperadix='10', sourcetypesize='100', description='', sourcetypeid='12', sourcetypename='VARCHAR')  SORTABLE,
+        dept_id = 'dept_id' :'java.lang.Integer' (OPT) (sourcetyperadix='10', sourcetypesize='10', description='', sourcetypeid='4', sourcetypename='INT')  SORTABLE,
+        salary = 'salary' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='2', sourcetyperadix='10', sourcetypesize='10', description='', sourcetypeid='3', sourcetypename='DECIMAL')  SORTABLE,
+        hire_date = 'hire_date' :'java.time.LocalDate' (OPT) (sourcetyperadix='10', sourcetypesize='10', description='', sourcetypeid='91', sourcetypename='DATE')  SORTABLE
+    )
+    CONSTRAINT 'PRIMARY' PRIMARY KEY ( 'emp_id' )
+    CONSTRAINT 'employees_ibfk_1' FOREIGN KEY ( 'dept_id' ) 
+    REFERENCES 'denodo'.'departments'( 'dept_id' )  ON UPDATE RESTRICT  ON DELETE RESTRICT NOT DEFERRABLE 
+    INDEX 'PRIMARY' CLUSTER UNIQUE PRIMARY ( 'emp_id' )
+    INDEX 'dept_id' OTHER ( 'dept_id' );
+
+CREATE OR REPLACE TABLE bv_employees I18N us_pst (
+        emp_id:int (notnull, sourcetypeid = '4', sourcetyperadix = '10', sourcetypesize = '10', description = ''),
+        emp_name:text (sourcetypeid = '12', sourcetyperadix = '10', sourcetypesize = '100', description = ''),
+        dept_id:int (sourcetypeid = '4', sourcetyperadix = '10', sourcetypesize = '10', description = ''),
+        salary:decimal (sourcetypeid = '3', sourcetyperadix = '10', sourcetypedecimals = '2', sourcetypesize = '10', description = ''),
+        hire_date:localdate (sourcetypeid = '91', sourcetyperadix = '10', sourcetypesize = '10', description = '')
+    )
+    FOLDER = '/1 - connections/2 - base views'
+    CONSTRAINT 'PRIMARY' PRIMARY KEY ( 'emp_id' )
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD bv_employees(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD emp_id (any) OPT ANY
+             ADD emp_name (any) OPT ANY
+             ADD dept_id (any) OPT ANY
+             ADD salary (any) OPT ANY
+             ADD hire_date (any) OPT ANY
+        )
+        OUTPUTLIST (dept_id, emp_id, emp_name, hire_date, salary
+        )
+        WRAPPER (jdbc bv_employees)
+    );
+
